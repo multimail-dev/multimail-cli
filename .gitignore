@@ -1,0 +1,9 @@
+# Binary
+multimail-pp-cli
+build/
+
+# OS
+.DS_Store
+
+# Cache
+.cache/
