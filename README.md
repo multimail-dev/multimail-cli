@@ -67,7 +67,7 @@ multimail-pp-cli mailbox list
 
 
 # check recent emails with minimal tokens
-multimail-pp-cli inbox --limit 10 --compact
+multimail-pp-cli search '' --limit 10 --compact
 
 
 # populate local cache for offline queries

@@ -262,7 +262,7 @@ Sync fresh data, check overall health, then surface any threads needing a respon
 ### Agent-friendly inbox scan
 
 ```bash
-multimail-pp-cli inbox --limit 20 --json --compact --select id,subject,from,date
+multimail-pp-cli search '' --limit 20 --json --compact --select id,subject,from,date
 ```
 
 Fetch recent emails with only the fields an agent needs, keeping context window small.
