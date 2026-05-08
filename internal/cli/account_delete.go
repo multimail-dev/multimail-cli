@@ -16,7 +16,7 @@ func newAccountDeleteCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "delete",
-		Short: "Hard-deletes all tenant data (mailboxes, emails, API keys, usage, audit log). Frees the slug for re-registration....",
+		Short: "Permanently delete account and all associated data",
 		Example: "  multimail-pp-cli account delete",
 		Annotations: map[string]string{"pp:endpoint": "account.delete", "pp:method": "DELETE", "pp:path": "/v1/account"},
 		RunE: func(cmd *cobra.Command, args []string) error {

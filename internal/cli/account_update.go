@@ -21,7 +21,7 @@ func newAccountUpdateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update",
-		Short: "Update tenant settings",
+		Short: "Update account settings",
 		Example: "  multimail-pp-cli account update",
 		Annotations: map[string]string{"pp:endpoint": "account.update", "pp:method": "PATCH", "pp:path": "/v1/account"},
 		RunE: func(cmd *cobra.Command, args []string) error {

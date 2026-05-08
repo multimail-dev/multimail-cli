@@ -26,23 +26,23 @@ import (
 func RegisterTools(s *server.MCPServer) {
 	s.AddTool(
 		mcplib.NewTool("account_create",
-			mcplib.WithDescription("Requires a solved proof-of-work challenge. Creates a pending signup and sends a confirmation email. Response is always identical for privacy (anti-enumeration). Honors an optional Idempotency-Key request header (UUID) to safely retry without creating duplicate pending_signups rows. Required: accepted_anti_spam_policy, accepted_operator_agreement, accepted_tos, operator_name, oversight_email, pow_solution. Optional: attribution, cf_challenge_response, email_use_type (plus 8 more). Returns the new SignupResponse."),
+			mcplib.WithDescription("Create a new account. Requires a verification challenge. Required: accepted_anti_spam_policy, accepted_operator_agreement, accepted_tos, operator_name, oversight_email, pow_solution. Optional: attribution, cf_challenge_response, email_use_type (plus 8 more). Returns the new SignupResponse."),
 			mcplib.WithString("accepted_anti_spam_policy", mcplib.Required(), mcplib.Description("Must be true.")),
 			mcplib.WithString("accepted_operator_agreement", mcplib.Required(), mcplib.Description("Must be true.")),
 			mcplib.WithString("accepted_tos", mcplib.Required(), mcplib.Description("Must be true.")),
-			mcplib.WithString("attribution", mcplib.Description("Optional client-captured conversion attribution (Phase 2 of plan 2026-04-27-003). The browser persists this in...")),
-			mcplib.WithString("cf_challenge_response", mcplib.Description("Preferred browser Turnstile token field. Mirrors the hidden cf-turnstile-response input value. maxLength keeps API...")),
+			mcplib.WithString("attribution", mcplib.Description("Optional conversion attribution data (JSON)")),
+			mcplib.WithString("cf_challenge_response", mcplib.Description("Browser challenge response token")),
 			mcplib.WithString("email_use_type", mcplib.Description("Only transactional is accepted today.")),
-			mcplib.WithString("fingerprint", mcplib.Description("Optional browser fingerprint used for signup throttling.")),
-			mcplib.WithString("form_open_at", mcplib.Description("Epoch milliseconds when the signup modal opened.")),
+			mcplib.WithString("fingerprint", mcplib.Description("Optional client fingerprint")),
+			mcplib.WithString("form_open_at", mcplib.Description("Form timing metadata")),
 			mcplib.WithString("operator_name", mcplib.Required(), mcplib.Description("Company or individual name. Included in identity headers and signature block.")),
 			mcplib.WithString("oversight_email", mcplib.Required(), mcplib.Description("Oversight email")),
 			mcplib.WithString("oversight_mode", mcplib.Description("Optional initial mailbox oversight mode. Unsafe modes are rejected.")),
-			mcplib.WithString("payment_method", mcplib.Description("Signup intent source. Pricing page starter flow sends stripe.")),
+			mcplib.WithString("payment_method", mcplib.Description("Payment method identifier")),
 			mcplib.WithString("physical_address", mcplib.Description("Physical address")),
-			mcplib.WithString("pow_solution", mcplib.Required(), mcplib.Description("Solved ALTCHA proof-of-work challenge from POST /v1/account/challenge.")),
-			mcplib.WithString("slug", mcplib.Description("URL-safe slug. Auto-generated from operator_name if omitted.")),
-			mcplib.WithString("turnstile_token", mcplib.Description("Legacy Turnstile token field. Accepted for backward compatibility. maxLength matches cf_challenge_response — see...")),
+			mcplib.WithString("pow_solution", mcplib.Required(), mcplib.Description("Challenge solution from the account challenge endpoint")),
+			mcplib.WithString("slug", mcplib.Description("Account identifier. Auto-generated from your name if omitted.")),
+			mcplib.WithString("turnstile_token", mcplib.Description("Legacy challenge token (backward compatibility)")),
 			mcplib.WithString("use_case", mcplib.Description("Use case")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -51,8 +51,8 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("account_create-challenge",
-			mcplib.WithDescription("Returns an ALTCHA challenge. Solve it and include the solution as pow_solution in POST /v1/account. Challenge expires in 5 minutes. Optional: oversight_email."),
-			mcplib.WithString("oversight_email", mcplib.Description("Optional. Calibrates difficulty based on email domain.")),
+			mcplib.WithDescription("Request a verification challenge for account creation. Solve it and include the solution as pow_solution. Challenge expires in 5 minutes. Optional: oversight_email."),
+			mcplib.WithString("oversight_email", mcplib.Description("Optional oversight email address")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -68,7 +68,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("account_delete",
-			mcplib.WithDescription("Hard-deletes all tenant data (mailboxes, emails, API keys, usage, audit log). Frees the slug for re-registration. Requires admin scope. Optional: approval_code. Returns the DeleteResponse. Destructive."),
+			mcplib.WithDescription("Delete an account. Requires admin scope. Optional: approval_code. Returns the DeleteResponse. Destructive."),
 			mcplib.WithString("approval_code", mcplib.Description("Approval code")),
 			mcplib.WithDestructiveHintAnnotation(true),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -77,7 +77,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("account_list",
-			mcplib.WithDescription("Get current tenant info and usage. Returns the AccountInfo."),
+			mcplib.WithDescription("Get current account info and usage. Returns the AccountInfo."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -86,7 +86,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("account_update",
-			mcplib.WithDescription("Update tenant settings. Optional: approval_code, name, oversight_email (plus 1 more). Partial update."),
+			mcplib.WithDescription("Update account settings. Optional: approval_code, name, oversight_email (plus 1 more). Partial update."),
 			mcplib.WithString("approval_code", mcplib.Description("Approval code")),
 			mcplib.WithString("name", mcplib.Description("Name")),
 			mcplib.WithString("oversight_email", mcplib.Description("Oversight email")),
@@ -97,9 +97,9 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("admin_create",
-			mcplib.WithDescription("Admin-only. Creates a new API key and emails it to the tenant's oversight email. Used when welcome email failed or KV expired before key retrieval. Required: reason, tenant_id. Returns the new CreateResponse."),
+			mcplib.WithDescription("Admin-only. Creates a new API key. Required: reason, tenant_id. Returns the new CreateResponse."),
 			mcplib.WithString("reason", mcplib.Required(), mcplib.Description("Reason")),
-			mcplib.WithString("tenant_id", mcplib.Required(), mcplib.Description("Tenant id")),
+			mcplib.WithString("tenant_id", mcplib.Required(), mcplib.Description("Account ID")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -107,7 +107,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("api-keys_create",
-			mcplib.WithDescription("Requires admin scope. The raw key is returned only once in the response. Required: name. Optional: scopes (default: [read]). Returns the new CreateResponse."),
+			mcplib.WithDescription("Create a new API key. Requires admin scope. Required: name. Optional: scopes (default: [read]). Returns the new CreateResponse."),
 			mcplib.WithString("name", mcplib.Required(), mcplib.Description("Name")),
 			mcplib.WithString("scopes", mcplib.Description("Scopes")),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -117,7 +117,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("api-keys_delete",
-			mcplib.WithDescription("Requires admin scope. Returns 202 with pending_approval on first call; resend with approval_code to complete. Required: keyId. Optional: approval_code. Destructive."),
+			mcplib.WithDescription("Delete an API key. Requires admin scope. Two-step approval. Required: keyId. Optional: approval_code. Destructive."),
 			mcplib.WithString("keyId", mcplib.Required(), mcplib.Description("Key id")),
 			mcplib.WithString("approval_code", mcplib.Description("Operator approval code (from email). Omit on first call to request approval.")),
 			mcplib.WithDestructiveHintAnnotation(true),
@@ -146,7 +146,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("approve_create",
-			mcplib.WithDescription("Process approval/rejection from hosted page. Required: token."),
+			mcplib.WithDescription("Internal approval handler. Required: token."),
 			mcplib.WithString("token", mcplib.Required(), mcplib.Description("Token")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -155,7 +155,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("approve_get",
-			mcplib.WithDescription("Render hosted approval page for oversight decisions. Required: token."),
+			mcplib.WithDescription("Internal approval page. Required: token."),
 			mcplib.WithString("token", mcplib.Required(), mcplib.Description("Token")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -176,7 +176,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create",
-			mcplib.WithDescription("Requires admin scope. Sets cancel_at_period_end on the Stripe subscription so the tenant retains access until the current billing period ends. Returns the new CreateResponse."),
+			mcplib.WithDescription("Cancel subscription. Requires admin scope."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -184,7 +184,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create-checkout",
-			mcplib.WithDescription("Create a Stripe checkout session for plan upgrade. Required: plan. Optional: cancel_url, interval (default: monthly), success_url. Returns the new CreateCheckoutResponse."),
+			mcplib.WithDescription("Create a checkout session for plan upgrade. Required: plan. Optional: cancel_url, interval (default: monthly), success_url."),
 			mcplib.WithString("cancel_url", mcplib.Description("Cancel url")),
 			mcplib.WithString("interval", mcplib.Description("Interval")),
 			mcplib.WithString("plan", mcplib.Required(), mcplib.Description("Plan")),
@@ -196,7 +196,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create-coinbasewebhook",
-			mcplib.WithDescription("Coinbase Commerce webhook handler (public, signature-verified)."),
+			mcplib.WithDescription("Internal webhook handler."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -204,7 +204,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create-cryptocheckout",
-			mcplib.WithDescription("Create a Coinbase Commerce checkout (crypto payment). Required: plan. Returns the new CreateCryptocheckoutResponse."),
+			mcplib.WithDescription("Create a crypto payment checkout. Required: plan."),
 			mcplib.WithString("plan", mcplib.Required(), mcplib.Description("Plan")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -213,7 +213,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create-portal",
-			mcplib.WithDescription("Requires admin scope. Returns a URL to the Stripe-hosted billing portal for self-service invoice, payment method, and plan management. Optional: return_url."),
+			mcplib.WithDescription("Returns a URL to the billing management portal. Requires admin scope. Optional: return_url."),
 			mcplib.WithString("return_url", mcplib.Description("Return url")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -222,17 +222,17 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create-pricingcheckout",
-			mcplib.WithDescription("Creates an inactive tenant, provisions a default mailbox, and returns a Stripe checkout URL. After payment, call GET /v1/billing/session-key to retrieve the API key. Honors an optional Idempotency-Key request header (UUID); the same key is forwarded to Stripe so duplicate Sessions are not created on retry. Required: accepted_anti_spam_policy, accepted_operator_agreement, accepted_tos, operator_name, oversight_email, plan. Optional: attribution, interval (default: monthly), oversight_mode (plus 2 more)."),
+			mcplib.WithDescription("Create a checkout session for a new account. Required: plan."),
 			mcplib.WithString("accepted_anti_spam_policy", mcplib.Required(), mcplib.Description("Accepted anti spam policy")),
 			mcplib.WithString("accepted_operator_agreement", mcplib.Required(), mcplib.Description("Accepted operator agreement")),
 			mcplib.WithString("accepted_tos", mcplib.Required(), mcplib.Description("Accepted tos")),
-			mcplib.WithString("attribution", mcplib.Description("Optional client-captured conversion attribution (Phase 2 of plan 2026-04-27-003). The browser persists this in...")),
+			mcplib.WithString("attribution", mcplib.Description("Optional conversion attribution data (JSON)")),
 			mcplib.WithString("interval", mcplib.Description("Interval")),
 			mcplib.WithString("operator_name", mcplib.Required(), mcplib.Description("Operator name")),
 			mcplib.WithString("oversight_email", mcplib.Required(), mcplib.Description("Oversight email")),
 			mcplib.WithString("oversight_mode", mcplib.Description("Oversight mode")),
 			mcplib.WithString("plan", mcplib.Required(), mcplib.Description("Plan")),
-			mcplib.WithString("turnstile_token", mcplib.Description("Turnstile token")),
+			mcplib.WithString("turnstile_token", mcplib.Description("Verification token")),
 			mcplib.WithString("use_case", mcplib.Description("Use case")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -241,7 +241,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_create-stripewebhook",
-			mcplib.WithDescription("Stripe webhook handler (public, signature-verified)."),
+			mcplib.WithDescription("Internal webhook handler."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -249,7 +249,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("billing_list",
-			mcplib.WithDescription("Public endpoint. Returns the API key stored during pricing-checkout, then deletes it. Key expires after 1 hour if not retrieved. Required: session_id."),
+			mcplib.WithDescription("Retrieve your API key after checkout. Required: session_id."),
 			mcplib.WithString("session_id", mcplib.Required(), mcplib.Description("Session id")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -259,7 +259,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("confirm_create",
-			mcplib.WithDescription("JSON response includes: status, name, oversight_mode, api_key, mailbox_id, mailbox_address, oversight_email, use_case. Browser form submissions redirect to /welcome."),
+			mcplib.WithDescription("Activate account with confirmation code."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -267,7 +267,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("confirm_get",
-			mcplib.WithDescription("Redirect to frontend confirmation page with code prefilled. Required: code."),
+			mcplib.WithDescription("Internal confirmation redirect."),
 			mcplib.WithString("code", mcplib.Required(), mcplib.Description("Code")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -277,7 +277,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("confirm_list",
-			mcplib.WithDescription("Redirect to frontend confirmation page at multimail.dev/confirm."),
+			mcplib.WithDescription("Internal confirmation redirect."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -362,7 +362,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("emails_list",
-			mcplib.WithDescription("Requires read scope. Without a status filter, returns spam_flagged and spam_quarantined emails across all tenant mailboxes. Optional: status, limit (default: 20), cursor."),
+			mcplib.WithDescription("List emails. Requires read scope. Optional: status, limit (default: 20), cursor."),
 			mcplib.WithString("status", mcplib.Description("Status")),
 			mcplib.WithString("limit", mcplib.Description("Limit")),
 			mcplib.WithString("cursor", mcplib.Description("Pagination cursor (received_at epoch from previous page)")),
@@ -392,7 +392,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("funnel_create",
-			mcplib.WithDescription("Pricing page beacon hit via navigator.sendBeacon to track open/submit/error events on the signup modal. Fire-and-forget; counters are best-effort (KV is non-atomic). IP-rate-limited to 30 req/min. Required: event. Returns the new CreateResponse."),
+			mcplib.WithDescription("Track a funnel event. Required: event."),
 			mcplib.WithString("event", mcplib.Required(), mcplib.Description("Event")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -401,7 +401,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("mailboxes_create",
-			mcplib.WithDescription("Requires admin scope. Address can be a local part (appended to tenant subdomain) or full address on a verified custom domain. Required: address_local. Optional: display_name, oversight_mode (default: gated_send), webhook_url. Returns the new CreateResponse."),
+			mcplib.WithDescription("Create a mailbox. Requires admin scope. Required: address_local. Optional: display_name, oversight_mode (default: gated_send), webhook_url."),
 			mcplib.WithString("address_local", mcplib.Required(), mcplib.Description("Local part (e.g. 'inbox') or full address on custom domain (e.g. 'inbox@custom.com')")),
 			mcplib.WithString("display_name", mcplib.Description("Display name")),
 			mcplib.WithString("oversight_mode", mcplib.Description("Ignored — new mailboxes always start at gated_send. Use the upgrade flow to change.")),
@@ -431,13 +431,13 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("mailboxes_update",
-			mcplib.WithDescription("Requires admin scope. Oversight mode can only be downgraded here; upgrades require the upgrade flow. Required: mailboxId. Optional: auto_bcc, auto_cc, display_name (plus 5 more). Returns the updated UpdateResponse."),
+			mcplib.WithDescription("Update mailbox settings. Requires admin scope. Required: mailboxId. Optional: auto_bcc, auto_cc, display_name (plus 5 more)."),
 			mcplib.WithString("mailboxId", mcplib.Required(), mcplib.Description("Mailbox id")),
 			mcplib.WithString("auto_bcc", mcplib.Description("Auto bcc")),
 			mcplib.WithString("auto_cc", mcplib.Description("Auto cc")),
 			mcplib.WithString("display_name", mcplib.Description("Display name")),
 			mcplib.WithString("forward_inbound", mcplib.Description("Forward inbound")),
-			mcplib.WithString("oversight_mode", mcplib.Description("Downgrade only. To upgrade, use POST /v1/mailboxes/{id}/request-upgrade.")),
+			mcplib.WithString("oversight_mode", mcplib.Description("Oversight mode")),
 			mcplib.WithString("oversight_webhook_url", mcplib.Description("Oversight webhook url")),
 			mcplib.WithString("signature_block", mcplib.Description("Signature block")),
 			mcplib.WithString("webhook_url", mcplib.Description("Webhook url")),
@@ -510,7 +510,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("mailboxes_emails_get-mailboxes-3",
-			mcplib.WithDescription("Requires read scope. Returns base64 inline for small files (<50KB) or a presigned URL for larger files. Required: mailboxId, emailId, filename."),
+			mcplib.WithDescription("Download an attachment. Requires read scope. Required: mailboxId, emailId, filename."),
 			mcplib.WithString("mailboxId", mcplib.Required(), mcplib.Description("Mailbox id")),
 			mcplib.WithString("emailId", mcplib.Required(), mcplib.Description("Email id")),
 			mcplib.WithString("filename", mcplib.Required(), mcplib.Description("Filename")),
@@ -562,7 +562,7 @@ func RegisterTools(s *server.MCPServer) {
 			mcplib.WithString("attachments", mcplib.Description("Attachments")),
 			mcplib.WithString("bcc", mcplib.Description("Bcc")),
 			mcplib.WithString("cc", mcplib.Description("Cc")),
-			mcplib.WithString("gate_timing", mcplib.Description("Override mailbox default: gate_first approves before scheduling, schedule_first schedules then approves on delivery")),
+			mcplib.WithString("gate_timing", mcplib.Description("Override approval timing (gate_first or schedule_first)")),
 			mcplib.WithString("idempotency_key", mcplib.Description("Dedup key (24h TTL). If resent within TTL, returns the original email ID.")),
 			mcplib.WithString("markdown", mcplib.Required(), mcplib.Description("Email body in markdown. Converted to HTML.")),
 			mcplib.WithString("send_at", mcplib.Description("Schedule delivery for a future time. ISO 8601 UTC (must end with Z). Example: 2026-03-15T14:00:00Z")),
@@ -605,7 +605,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("multimail-health_list",
-			mcplib.WithDescription("Verifies D1 and R2 connectivity. No auth required. Returns the ListResponse."),
+			mcplib.WithDescription("Health check. No auth required."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -614,7 +614,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("operator_create",
-			mcplib.WithDescription("Requires admin scope. Clears the operator-session cookie."),
+			mcplib.WithDescription("End operator session. Requires admin scope."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -622,7 +622,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("operator_create-startsession",
-			mcplib.WithDescription("Requires admin scope. Sends a one-time code to the oversight email and begins the operator-session OTP flow. Returns the new CreateStartsessionResponse."),
+			mcplib.WithDescription("Start operator session. Requires admin scope. Sends a one-time code to the oversight email."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -630,7 +630,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("operator_create-verifysession",
-			mcplib.WithDescription("Requires admin scope. Exchanges a one-time code for a short-lived HttpOnly operator-session cookie. Required: code. Returns the new CreateVerifysessionResponse."),
+			mcplib.WithDescription("Verify operator session code. Requires admin scope. Required: code."),
 			mcplib.WithString("code", mcplib.Required(), mcplib.Description("Code")),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -639,7 +639,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("operator_list",
-			mcplib.WithDescription("Requires admin scope. Reports whether the current browser has an active operator-session cookie. Returns the ListResponse."),
+			mcplib.WithDescription("Check operator session status. Requires admin scope."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -677,7 +677,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("support_create",
-			mcplib.WithDescription("Public endpoint. Requires a solved ALTCHA proof-of-work payload. Sends a message to support@multimail.dev. Required: email, message, name, pow_solution, subject. Returns the new CreateResponse."),
+			mcplib.WithDescription("Send a support message. Required: email, message, name, pow_solution, subject."),
 			mcplib.WithString("email", mcplib.Required(), mcplib.Description("Email")),
 			mcplib.WithString("message", mcplib.Required(), mcplib.Description("Message")),
 			mcplib.WithString("name", mcplib.Required(), mcplib.Description("Name")),
@@ -717,7 +717,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("unsubscribe_get",
-			mcplib.WithDescription("Render unsubscribe page (CAN-SPAM). Required: token."),
+			mcplib.WithDescription("Process unsubscribe (CAN-SPAM). Required: token."),
 			mcplib.WithString("token", mcplib.Required(), mcplib.Description("Token")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -750,7 +750,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("webhooks_create",
-			mcplib.WithDescription("Subscribe to email events. Returns the signing secret (shown only on creation). Requires admin scope. Required: events, url. Optional: mailbox_id."),
+			mcplib.WithDescription("Subscribe to email events. Requires admin scope. Required: events, url. Optional: mailbox_id."),
 			mcplib.WithString("events", mcplib.Required(), mcplib.Description("Event types to subscribe to")),
 			mcplib.WithString("mailbox_id", mcplib.Description("Optional: scope to a specific mailbox")),
 			mcplib.WithString("url", mcplib.Required(), mcplib.Description("HTTPS URL to receive events")),
@@ -761,7 +761,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("webhooks_create-postmark",
-			mcplib.WithDescription("Postmark bounce/complaint/delivery webhook handler."),
+			mcplib.WithDescription("Internal webhook handler."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -769,7 +769,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("webhooks_create-postmarkinbound",
-			mcplib.WithDescription("Receives inbound emails from Postmark. Authenticated via HTTP Basic Auth with the Postmark webhook secret. Not a consumer API endpoint. Returns the new CreatePostmarkinboundResponse."),
+			mcplib.WithDescription("Internal inbound email webhook handler."),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
 		),
@@ -786,7 +786,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("webhooks_get",
-			mcplib.WithDescription("Includes signing secret. Requires admin scope. Required: id. Returns the WebhookSubscription."),
+			mcplib.WithDescription("Get webhook details. Requires admin scope. Required: id."),
 			mcplib.WithString("id", mcplib.Required(), mcplib.Description("Id")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -796,7 +796,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("webhooks_list",
-			mcplib.WithDescription("Requires admin scope. Signing secrets are not included in the list. Returns the ListResponse."),
+			mcplib.WithDescription("List webhook subscriptions. Requires admin scope."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -805,7 +805,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("well-known_get",
-			mcplib.WithDescription("Rate-limited to 10 lookups per IP per hour. Required: hash."),
+			mcplib.WithDescription("Look up sender reputation. Required: hash."),
 			mcplib.WithString("hash", mcplib.Required(), mcplib.Description("Hash")),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
@@ -815,7 +815,7 @@ func RegisterTools(s *server.MCPServer) {
 	)
 	s.AddTool(
 		mcplib.NewTool("well-known_list",
-			mcplib.WithDescription("Returns the ECDSA P-256 public key used to sign X-MultiMail-Identity headers."),
+			mcplib.WithDescription("Returns the public key used to verify sender identity headers."),
 			mcplib.WithReadOnlyHintAnnotation(true),
 			mcplib.WithDestructiveHintAnnotation(false),
 			mcplib.WithOpenWorldHintAnnotation(true),
@@ -1098,7 +1098,7 @@ func handleSQL(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToo
 func handleContext(_ context.Context, _ mcplib.CallToolRequest) (*mcplib.CallToolResult, error) {
 	ctx := map[string]any{
 		"api":         "multimail",
-		"description": "Email-as-a-Service for AI agents. Inbound email converted to markdown, outbound markdown converted to HTML. Built on...",
+		"description": "Email-as-a-Service for AI agents. Inbound email converted to markdown, outbound markdown converted to HTML.",
 		"archetype":   "crm",
 		"tool_count":  77,
 		// tool_surface tells agents which surface a capability lives on.

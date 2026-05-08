@@ -508,9 +508,8 @@ func printOutputWithFlags(w io.Writer, data json.RawMessage, flags *rootFlags) e
 // printAutoTable) that expect arrays or flat objects.
 //
 // Only unwraps when a "status" field is present and indicates success — this
-// avoids false positives on APIs where "data" is a regular field (e.g., Stripe
-// returns {"data":[...],"has_more":true} where "data" is the list, not an
-// envelope wrapper).
+// avoids false positives on APIs where "data" is a regular field rather than
+// an envelope wrapper.
 func extractResponseData(data json.RawMessage) json.RawMessage {
 	var envelope struct {
 		Status string          `json:"status"`

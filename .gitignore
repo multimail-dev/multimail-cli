@@ -1,5 +1,5 @@
-# Binary
-multimail-pp-cli
+# Binary (root only, not cmd/ dir)
+/multimail-pp-cli
 build/
 
 # OS
@@ -7,3 +7,6 @@ build/
 
 # Cache
 .cache/
+
+# Raw OpenAPI spec (used locally by printing-press, not for public repo)
+spec.json

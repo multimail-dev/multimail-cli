@@ -17,7 +17,7 @@ func newBillingCreateStripewebhookCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-stripewebhook",
-		Short: "Stripe webhook handler (public, signature-verified)",
+		Short: "Internal webhook handler",
 		Example: "  multimail-pp-cli billing create-stripewebhook",
 		Annotations: map[string]string{"pp:endpoint": "billing.create-stripewebhook", "pp:method": "POST", "pp:path": "/v1/billing/stripe-webhook"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -110,5 +110,6 @@ func newBillingCreateStripewebhookCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 
+	cmd.Hidden = true
 	return cmd
 }

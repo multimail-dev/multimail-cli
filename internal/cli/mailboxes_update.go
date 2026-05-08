@@ -25,7 +25,7 @@ func newMailboxesUpdateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "update <mailboxId>",
-		Short: "Requires admin scope. Oversight mode can only be downgraded here; upgrades require the upgrade flow.",
+		Short: "Update mailbox settings. Requires admin scope.",
 		Example: "  multimail-pp-cli mailboxes update 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "mailboxes.update", "pp:method": "PATCH", "pp:path": "/v1/mailboxes/{mailboxId}"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -148,7 +148,7 @@ func newMailboxesUpdateCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&bodyAutoCc, "auto-cc", "", "Auto cc")
 	cmd.Flags().StringVar(&bodyDisplayName, "display-name", "", "Display name")
 	cmd.Flags().BoolVar(&bodyForwardInbound, "forward-inbound", false, "Forward inbound")
-	cmd.Flags().StringVar(&bodyOversightMode, "oversight-mode", "", "Downgrade only. To upgrade, use POST /v1/mailboxes/{id}/request-upgrade.")
+	cmd.Flags().StringVar(&bodyOversightMode, "oversight-mode", "", "Downgrade only. Use the upgrade flow to change oversight mode.")
 	cmd.Flags().StringVar(&bodyOversightWebhookUrl, "oversight-webhook-url", "", "Oversight webhook url")
 	cmd.Flags().StringVar(&bodySignatureBlock, "signature-block", "", "Signature block")
 	cmd.Flags().StringVar(&bodyWebhookUrl, "webhook-url", "", "Webhook url")

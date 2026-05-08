@@ -17,7 +17,7 @@ func newBillingCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Requires admin scope. Sets cancel_at_period_end on the Stripe subscription so the tenant retains access until the...",
+		Short: "Cancel subscription (retains access until end of billing period)",
 		Example: "  multimail-pp-cli billing create",
 		Annotations: map[string]string{"pp:endpoint": "billing.create", "pp:method": "POST", "pp:path": "/v1/billing/cancel"},
 		RunE: func(cmd *cobra.Command, args []string) error {

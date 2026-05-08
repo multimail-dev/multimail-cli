@@ -19,7 +19,7 @@ func newApiKeysCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Requires admin scope. The raw key is returned only once in the response.",
+		Short: "Create a new API key. Requires admin scope.",
 		Example: "  multimail-pp-cli api-keys create --name example-resource",
 		Annotations: map[string]string{"pp:endpoint": "api-keys.create", "pp:method": "POST", "pp:path": "/v1/api-keys"},
 		RunE: func(cmd *cobra.Command, args []string) error {

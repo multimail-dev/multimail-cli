@@ -162,34 +162,27 @@ Run `multimail-pp-cli --help` for the full command reference and flag list.
 
 Manage account
 
-- **`multimail-pp-cli account create`** - Requires a solved proof-of-work challenge. Creates a pending signup and sends a confirmation email. Response is always identical for privacy (anti-enumeration). Honors an optional Idempotency-Key request header (UUID) to safely retry without creating duplicate pending_signups rows.
-- **`multimail-pp-cli account create-challenge`** - Returns an ALTCHA challenge. Solve it and include the solution as pow_solution in POST /v1/account. Challenge expires in 5 minutes.
-- **`multimail-pp-cli account create-resendconfirmation`** - Public endpoint (no auth required). Resends the activation email with a new code for unconfirmed accounts. Rate limited to 1 request per 10 minutes.
-- **`multimail-pp-cli account delete`** - Hard-deletes all tenant data (mailboxes, emails, API keys, usage, audit log). Frees the slug for re-registration. Requires admin scope.
-- **`multimail-pp-cli account list`** - Get current tenant info and usage
-- **`multimail-pp-cli account update`** - Update tenant settings
+- **`multimail-pp-cli account create`** - Create a new account
+- **`multimail-pp-cli account create-challenge`** - Request a verification challenge for account creation
+- **`multimail-pp-cli account create-resendconfirmation`** - Resend the account activation email
+- **`multimail-pp-cli account delete`** - Permanently delete account and all associated data
+- **`multimail-pp-cli account list`** - Get current account info and usage
+- **`multimail-pp-cli account update`** - Update account settings
 
 ### admin
 
-Manage admin
+Create and email a new API key to the account owner
 
-- **`multimail-pp-cli admin create`** - Admin-only. Creates a new API key and emails it to the tenant's oversight email. Used when welcome email failed or KV expired before key retrieval.
+- **`multimail-pp-cli admin create`** - Admin-only. Creates a new API key. Required: reason, tenant_id.
 
 ### api-keys
 
 Manage api keys
 
-- **`multimail-pp-cli api-keys create`** - Requires admin scope. The raw key is returned only once in the response.
-- **`multimail-pp-cli api-keys delete`** - Requires admin scope. Returns 202 with pending_approval on first call; resend with approval_code to complete.
+- **`multimail-pp-cli api-keys create`** - Create a new API key. Requires admin scope.
+- **`multimail-pp-cli api-keys delete`** - Delete an API key (requires admin scope, two-step approval)
 - **`multimail-pp-cli api-keys list`** - Requires admin scope. Returns key prefix, scopes, and metadata.
 - **`multimail-pp-cli api-keys update`** - Update API key name or scopes
-
-### approve
-
-Manage approve
-
-- **`multimail-pp-cli approve create`** - Process approval/rejection from hosted page
-- **`multimail-pp-cli approve get`** - Render hosted approval page for oversight decisions
 
 ### audit-log
 
@@ -201,22 +194,18 @@ Manage audit log
 
 Manage billing
 
-- **`multimail-pp-cli billing create`** - Requires admin scope. Sets cancel_at_period_end on the Stripe subscription so the tenant retains access until the current billing period ends.
-- **`multimail-pp-cli billing create-checkout`** - Create a Stripe checkout session for plan upgrade
-- **`multimail-pp-cli billing create-coinbasewebhook`** - Coinbase Commerce webhook handler (public, signature-verified)
-- **`multimail-pp-cli billing create-cryptocheckout`** - Create a Coinbase Commerce checkout (crypto payment)
-- **`multimail-pp-cli billing create-portal`** - Requires admin scope. Returns a URL to the Stripe-hosted billing portal for self-service invoice, payment method, and plan management.
-- **`multimail-pp-cli billing create-pricingcheckout`** - Creates an inactive tenant, provisions a default mailbox, and returns a Stripe checkout URL. After payment, call GET /v1/billing/session-key to retrieve the API key. Honors an optional Idempotency-Key request header (UUID); the same key is forwarded to Stripe so duplicate Sessions are not created on retry.
-- **`multimail-pp-cli billing create-stripewebhook`** - Stripe webhook handler (public, signature-verified)
-- **`multimail-pp-cli billing list`** - Public endpoint. Returns the API key stored during pricing-checkout, then deletes it. Key expires after 1 hour if not retrieved.
+- **`multimail-pp-cli billing create`** - Cancel subscription (retains access until end of billing period)
+- **`multimail-pp-cli billing create-checkout`** - Create a checkout session for plan upgrade
+- **`multimail-pp-cli billing create-cryptocheckout`** - Create a crypto payment checkout
+- **`multimail-pp-cli billing create-portal`** - Open the billing management portal
+- **`multimail-pp-cli billing create-pricingcheckout`** - Start the signup checkout flow
+- **`multimail-pp-cli billing list`** - Retrieve your API key after checkout
 
 ### confirm
 
 Manage confirm
 
-- **`multimail-pp-cli confirm create`** - JSON response includes: status, name, oversight_mode, api_key, mailbox_id, mailbox_address, oversight_email, use_case. Browser form submissions redirect to /welcome.
-- **`multimail-pp-cli confirm get`** - Redirect to frontend confirmation page with code prefilled
-- **`multimail-pp-cli confirm list`** - Redirect to frontend confirmation page at multimail.dev/confirm
+- **`multimail-pp-cli confirm create`** - Activate account with confirmation code
 
 ### contacts
 
@@ -237,24 +226,24 @@ Manage domains
 
 ### emails
 
-Manage emails
+List spam and quarantined emails across all mailboxes
 
-- **`multimail-pp-cli emails list`** - Requires read scope. Without a status filter, returns spam_flagged and spam_quarantined emails across all tenant mailboxes.
+- **`multimail-pp-cli emails list`** - Requires read scope. List emails with optional status filter.
 
 ### funnel
 
-Manage funnel
+Track funnel analytics events
 
-- **`multimail-pp-cli funnel create`** - Pricing page beacon hit via navigator.sendBeacon to track open/submit/error events on the signup modal. Fire-and-forget; counters are best-effort (KV is non-atomic). IP-rate-limited to 30 req/min.
+- **`multimail-pp-cli funnel create`** - Record a funnel analytics event.
 
 ### mailboxes
 
 Manage mailboxes
 
-- **`multimail-pp-cli mailboxes create`** - Requires admin scope. Address can be a local part (appended to tenant subdomain) or full address on a verified custom domain.
+- **`multimail-pp-cli mailboxes create`** - Create a new mailbox. Requires admin scope.
 - **`multimail-pp-cli mailboxes delete`** - Requires admin scope.
 - **`multimail-pp-cli mailboxes list`** - Requires read scope.
-- **`multimail-pp-cli mailboxes update`** - Requires admin scope. Oversight mode can only be downgraded here; upgrades require the upgrade flow.
+- **`multimail-pp-cli mailboxes update`** - Update mailbox settings. Requires admin scope.
 
 ### multimail-export
 
@@ -264,18 +253,18 @@ Manage multimail export
 
 ### multimail-health
 
-Manage multimail health
+Check API health status
 
-- **`multimail-pp-cli multimail-health list`** - Verifies D1 and R2 connectivity. No auth required.
+- **`multimail-pp-cli multimail-health list`** - Health check. No auth required.
 
 ### operator
 
 Manage operator
 
-- **`multimail-pp-cli operator create`** - Requires admin scope. Clears the operator-session cookie.
-- **`multimail-pp-cli operator create-startsession`** - Requires admin scope. Sends a one-time code to the oversight email and begins the operator-session OTP flow.
-- **`multimail-pp-cli operator create-verifysession`** - Requires admin scope. Exchanges a one-time code for a short-lived HttpOnly operator-session cookie.
-- **`multimail-pp-cli operator list`** - Requires admin scope. Reports whether the current browser has an active operator-session cookie.
+- **`multimail-pp-cli operator create`** - End operator session. Requires admin scope.
+- **`multimail-pp-cli operator create-startsession`** - Start operator session. Sends a verification code. Requires admin scope.
+- **`multimail-pp-cli operator create-verifysession`** - Verify operator session with one-time code. Requires admin scope.
+- **`multimail-pp-cli operator list`** - Check operator session status. Requires admin scope.
 
 ### oversight
 
@@ -286,15 +275,15 @@ Manage oversight
 
 ### slug-check
 
-Manage slug check
+Check if an account name is available
 
-- **`multimail-pp-cli slug-check get`** - Check if a slug is available for registration. Returns suggestions if taken or reserved. No auth required.
+- **`multimail-pp-cli slug-check get`** - Check if an account name is available. Returns suggestions if taken or reserved. No auth required.
 
 ### support
 
-Manage support
+Submit a support request
 
-- **`multimail-pp-cli support create`** - Public endpoint. Requires a solved ALTCHA proof-of-work payload. Sends a message to support@multimail.dev.
+- **`multimail-pp-cli support create`** - Send a support message. Requires a verification challenge.
 
 ### suppression
 
@@ -308,7 +297,7 @@ Manage suppression
 Manage unsubscribe
 
 - **`multimail-pp-cli unsubscribe create`** - Process unsubscribe request
-- **`multimail-pp-cli unsubscribe get`** - Render unsubscribe page (CAN-SPAM)
+- **`multimail-pp-cli unsubscribe get`** - Process unsubscribe (CAN-SPAM)
 
 ### usage
 
@@ -326,19 +315,17 @@ Manage webhook deliveries
 
 Manage webhooks
 
-- **`multimail-pp-cli webhooks create`** - Subscribe to email events. Returns the signing secret (shown only on creation). Requires admin scope.
-- **`multimail-pp-cli webhooks create-postmark`** - Postmark bounce/complaint/delivery webhook handler
-- **`multimail-pp-cli webhooks create-postmarkinbound`** - Receives inbound emails from Postmark. Authenticated via HTTP Basic Auth with the Postmark webhook secret. Not a consumer API endpoint.
+- **`multimail-pp-cli webhooks create`** - Subscribe to email events. Requires admin scope.
 - **`multimail-pp-cli webhooks delete`** - Delete a webhook subscription
-- **`multimail-pp-cli webhooks get`** - Includes signing secret. Requires admin scope.
-- **`multimail-pp-cli webhooks list`** - Requires admin scope. Signing secrets are not included in the list.
+- **`multimail-pp-cli webhooks get`** - Get webhook details. Requires admin scope.
+- **`multimail-pp-cli webhooks list`** - List webhook subscriptions. Requires admin scope.
 
 ### well-known
 
 Manage well known
 
-- **`multimail-pp-cli well-known get`** - Rate-limited to 10 lookups per IP per hour.
-- **`multimail-pp-cli well-known list`** - Returns the ECDSA P-256 public key used to sign X-MultiMail-Identity headers.
+- **`multimail-pp-cli well-known get`** - Look up sender identity by hash
+- **`multimail-pp-cli well-known list`** - Get the public signing key
 
 
 ## Output Formats
@@ -470,7 +457,7 @@ Environment variables:
 ### API-specific
 
 - **401 Unauthorized on every command** — Set MULTIMAIL_API_KEY=mm_live_... (get from MultiMail dashboard or mm auth setup)
-- **403 with 'error code: 1020'** — Cloudflare API Shield is blocking the request body size. Try a smaller payload or contact support.
+- **403 with 'error code: 1020'** — The API gateway is blocking the request. Contact support if this persists.
 - **Empty inbox results after sync** — Verify mailbox_id with 'mm mailbox list'. If using multiple mailboxes, specify --mailbox <id>.
 - **Oversight decide returns 403** — The API key needs 'oversight' scope. Create a new key with 'mm key create --scopes oversight'.
 

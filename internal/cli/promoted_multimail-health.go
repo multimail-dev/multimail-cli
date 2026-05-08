@@ -15,8 +15,8 @@ func newMultimailHealthPromotedCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "multimail-health",
-		Short: "Verifies D1 and R2 connectivity. No auth required.",
-		Long:  "Shortcut for 'multimail-health list'. Verifies D1 and R2 connectivity. No auth required.",
+		Short: "Check API health status",
+		Long:  "Shortcut for 'multimail-health list'. Check API health status. No auth required.",
 		Example: "  multimail-pp-cli multimail-health",
 		Annotations: map[string]string{"pp:endpoint": "multimail-health.list", "pp:method": "GET", "pp:path": "/health", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {

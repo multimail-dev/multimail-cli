@@ -17,7 +17,7 @@ func newAccountCreateResendconfirmationCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-resendconfirmation",
-		Short: "Public endpoint (no auth required). Resends the activation email with a new code for unconfirmed accounts. Rate...",
+		Short: "Resend the account activation email",
 		Example: "  multimail-pp-cli account create-resendconfirmation",
 		Annotations: map[string]string{"pp:endpoint": "account.create-resendconfirmation", "pp:method": "POST", "pp:path": "/v1/account/resend-confirmation"},
 		RunE: func(cmd *cobra.Command, args []string) error {

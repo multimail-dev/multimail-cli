@@ -17,7 +17,7 @@ func newMailboxesEmailsCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create <mailboxId> <emailId>",
-		Short: "Cancels an email in pending_send_approval or pending_inbound_approval status. Idempotent if already cancelled....",
+		Short: "Cancel a pending email",
 		Example: "  multimail-pp-cli mailboxes emails create 550e8400-e29b-41d4-a716-446655440000 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "emails.create", "pp:method": "POST", "pp:path": "/v1/mailboxes/{mailboxId}/emails/{emailId}/cancel"},
 		RunE: func(cmd *cobra.Command, args []string) error {

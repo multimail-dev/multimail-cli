@@ -18,7 +18,7 @@ func newBillingCreatePortalCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-portal",
-		Short: "Requires admin scope. Returns a URL to the Stripe-hosted billing portal for self-service invoice, payment method,...",
+		Short: "Open the billing management portal",
 		Example: "  multimail-pp-cli billing create-portal",
 		Annotations: map[string]string{"pp:endpoint": "billing.create-portal", "pp:method": "POST", "pp:path": "/v1/billing/portal"},
 		RunE: func(cmd *cobra.Command, args []string) error {

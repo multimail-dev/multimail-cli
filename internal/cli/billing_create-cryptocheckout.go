@@ -18,7 +18,7 @@ func newBillingCreateCryptocheckoutCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-cryptocheckout",
-		Short: "Create a Coinbase Commerce checkout (crypto payment)",
+		Short: "Create a crypto payment checkout",
 		Example: "  multimail-pp-cli billing create-cryptocheckout --plan example-value",
 		Annotations: map[string]string{"pp:endpoint": "billing.create-cryptocheckout", "pp:method": "POST", "pp:path": "/v1/billing/crypto-checkout"},
 		RunE: func(cmd *cobra.Command, args []string) error {

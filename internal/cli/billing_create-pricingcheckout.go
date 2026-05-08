@@ -28,7 +28,7 @@ func newBillingCreatePricingcheckoutCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-pricingcheckout",
-		Short: "Creates an inactive tenant, provisions a default mailbox, and returns a Stripe checkout URL. After payment, call GET...",
+		Short: "Start the signup checkout flow",
 		Example: "  multimail-pp-cli billing create-pricingcheckout --operator-name example-resource",
 		Annotations: map[string]string{"pp:endpoint": "billing.create-pricingcheckout", "pp:method": "POST", "pp:path": "/v1/billing/pricing-checkout"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -177,13 +177,13 @@ func newBillingCreatePricingcheckoutCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().BoolVar(&bodyAcceptedAntiSpamPolicy, "accepted-anti-spam-policy", false, "Accepted anti spam policy")
 	cmd.Flags().BoolVar(&bodyAcceptedOperatorAgreement, "accepted-operator-agreement", false, "Accepted operator agreement")
 	cmd.Flags().BoolVar(&bodyAcceptedTos, "accepted-tos", false, "Accepted tos")
-	cmd.Flags().StringVar(&bodyAttribution, "attribution", "", "Optional client-captured conversion attribution (Phase 2 of plan 2026-04-27-003). The browser persists this in...")
+	cmd.Flags().StringVar(&bodyAttribution, "attribution", "", "Optional conversion attribution data (JSON)")
 	cmd.Flags().StringVar(&bodyInterval, "interval", "monthly", "Interval")
 	cmd.Flags().StringVar(&bodyOperatorName, "operator-name", "", "Operator name")
 	cmd.Flags().StringVar(&bodyOversightEmail, "oversight-email", "", "Oversight email")
 	cmd.Flags().StringVar(&bodyOversightMode, "oversight-mode", "", "Oversight mode")
 	cmd.Flags().StringVar(&bodyPlan, "plan", "", "Plan")
-	cmd.Flags().StringVar(&bodyTurnstileToken, "turnstile-token", "", "Turnstile token")
+	cmd.Flags().StringVar(&bodyTurnstileToken, "turnstile-token", "", "Verification token")
 	cmd.Flags().StringVar(&bodyUseCase, "use-case", "", "Use case")
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 

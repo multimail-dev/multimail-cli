@@ -21,7 +21,7 @@ func newMailboxesCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Requires admin scope. Address can be a local part (appended to tenant subdomain) or full address on a verified...",
+		Short: "Create a new mailbox. Requires admin scope.",
 		Example: "  multimail-pp-cli mailboxes create --address-local example-value",
 		Annotations: map[string]string{"pp:endpoint": "mailboxes.create", "pp:method": "POST", "pp:path": "/v1/mailboxes"},
 		RunE: func(cmd *cobra.Command, args []string) error {

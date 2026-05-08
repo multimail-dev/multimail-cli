@@ -16,8 +16,8 @@ func newFunnelPromotedCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "funnel",
-		Short: "Pricing page beacon hit via navigator.sendBeacon to track open/submit/error events on the signup modal....",
-		Long:  "Shortcut for 'funnel create'. Pricing page beacon hit via navigator.sendBeacon to track open/submit/error events on the signup modal....",
+		Short: "Record a funnel analytics event",
+		Long:  "Record a funnel analytics event. Shortcut for 'funnel create'.",
 		Example: "  multimail-pp-cli funnel --event example-value",
 		Annotations: map[string]string{"pp:endpoint": "funnel.create", "pp:method": "POST", "pp:path": "/v1/funnel/event"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -95,5 +95,6 @@ func newFunnelPromotedCmd(flags *rootFlags) *cobra.Command {
 
 	// Wire sibling endpoints and sub-resources as subcommands
 
+	cmd.Hidden = true
 	return cmd
 }

@@ -15,7 +15,7 @@ func newWellKnownGetCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "get <hash>",
-		Short: "Rate-limited to 10 lookups per IP per hour.",
+		Short: "Look up sender identity by hash",
 		Example: "  multimail-pp-cli well-known get example-value",
 		Annotations: map[string]string{"pp:endpoint": "well-known.get", "pp:method": "GET", "pp:path": "/.well-known/reputation/{hash}", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {

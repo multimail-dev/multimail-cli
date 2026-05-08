@@ -20,7 +20,7 @@ func newWebhooksCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Subscribe to email events. Returns the signing secret (shown only on creation). Requires admin scope.",
+		Short: "Subscribe to email events. Requires admin scope.",
 		Example: "  multimail-pp-cli webhooks create --url https://example.com/resource",
 		Annotations: map[string]string{"pp:endpoint": "webhooks.create", "pp:method": "POST", "pp:path": "/v1/webhooks"},
 		RunE: func(cmd *cobra.Command, args []string) error {

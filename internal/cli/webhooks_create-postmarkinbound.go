@@ -17,7 +17,7 @@ func newWebhooksCreatePostmarkinboundCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-postmarkinbound",
-		Short: "Receives inbound emails from Postmark. Authenticated via HTTP Basic Auth with the Postmark webhook secret. Not a...",
+		Short: "Internal webhook handler",
 		Example: "  multimail-pp-cli webhooks create-postmarkinbound",
 		Annotations: map[string]string{"pp:endpoint": "webhooks.create-postmarkinbound", "pp:method": "POST", "pp:path": "/v1/webhooks/postmark-inbound"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -110,5 +110,6 @@ func newWebhooksCreatePostmarkinboundCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 
+	cmd.Hidden = true
 	return cmd
 }

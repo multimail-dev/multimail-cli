@@ -21,7 +21,7 @@ func newBillingCreateCheckoutCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-checkout",
-		Short: "Create a Stripe checkout session for plan upgrade",
+		Short: "Create a checkout session for plan upgrade",
 		Example: "  multimail-pp-cli billing create-checkout --plan example-value",
 		Annotations: map[string]string{"pp:endpoint": "billing.create-checkout", "pp:method": "POST", "pp:path": "/v1/billing/checkout"},
 		RunE: func(cmd *cobra.Command, args []string) error {

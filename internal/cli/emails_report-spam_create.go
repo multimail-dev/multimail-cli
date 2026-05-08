@@ -17,7 +17,7 @@ func newEmailsReportSpamCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create <id>",
-		Short: "Requires send scope. Moves the email to spam_quarantined and records a user spam label.",
+		Short: "Report an email as spam. Requires send scope.",
 		Example: "  multimail-pp-cli emails report-spam create 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "report-spam.create", "pp:method": "POST", "pp:path": "/v1/emails/{id}/report-spam"},
 		RunE: func(cmd *cobra.Command, args []string) error {

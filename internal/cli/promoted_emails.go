@@ -19,8 +19,8 @@ func newEmailsPromotedCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "emails",
-		Short: "Requires read scope. Without a status filter, returns spam_flagged and spam_quarantined emails across all tenant...",
-		Long:  "Shortcut for 'emails list'. Requires read scope. Without a status filter, returns spam_flagged and spam_quarantined emails across all tenant...",
+		Short: "List spam and quarantined emails across all mailboxes",
+		Long:  "List spam and quarantined emails across all mailboxes. Shortcut for 'emails list'.",
 		Example: "  multimail-pp-cli emails",
 		Annotations: map[string]string{"pp:endpoint": "emails.list", "pp:method": "GET", "pp:path": "/v1/emails", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {

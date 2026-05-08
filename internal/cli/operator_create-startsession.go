@@ -17,7 +17,7 @@ func newOperatorCreateStartsessionCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-startsession",
-		Short: "Requires admin scope. Sends a one-time code to the oversight email and begins the operator-session OTP flow.",
+		Short: "Start operator session. Sends a verification code. Requires admin scope.",
 		Example: "  multimail-pp-cli operator create-startsession",
 		Annotations: map[string]string{"pp:endpoint": "operator.create-startsession", "pp:method": "POST", "pp:path": "/v1/operator/start-session"},
 		RunE: func(cmd *cobra.Command, args []string) error {

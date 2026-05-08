@@ -86,11 +86,9 @@ func attachFreshness(prov DataProvenance, flags *rootFlags) DataProvenance {
 //   - isList: true for list endpoints, false for get-by-ID endpoints
 //   - path: the API path (e.g., "/links" or "/links/abc123")
 //   - params: query parameters for the API call
-//   - headers: per-endpoint required headers (e.g. cal-api-version, Stripe-Version)
+//   - headers: per-endpoint required headers (e.g. X-Api-Version)
 //     baked in by the command template at codegen time. Pass nil when the endpoint
-//     declares no per-endpoint header overrides. Without this parameter, store-backed
-//     reads on per-endpoint-versioned APIs silently get the wrong response shape
-//     (cal-com retro #334 F1).
+//     declares no per-endpoint header overrides.
 func resolveRead(ctx context.Context, c *client.Client, flags *rootFlags, resourceType string, isList bool, path string, params map[string]string, headers map[string]string) (json.RawMessage, DataProvenance, error) {
 	switch flags.dataSource {
 	case "local":

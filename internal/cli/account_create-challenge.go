@@ -18,7 +18,7 @@ func newAccountCreateChallengeCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-challenge",
-		Short: "Returns an ALTCHA challenge. Solve it and include the solution as pow_solution in POST /v1/account. Challenge...",
+		Short: "Request a verification challenge for account creation",
 		Example: "  multimail-pp-cli account create-challenge",
 		Annotations: map[string]string{"pp:endpoint": "account.create-challenge", "pp:method": "POST", "pp:path": "/v1/account/challenge"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -112,7 +112,7 @@ func newAccountCreateChallengeCmd(flags *rootFlags) *cobra.Command {
 			return printOutputWithFlags(cmd.OutOrStdout(), data, flags)
 		},
 	}
-	cmd.Flags().StringVar(&bodyOversightEmail, "oversight-email", "", "Optional. Calibrates difficulty based on email domain.")
+	cmd.Flags().StringVar(&bodyOversightEmail, "oversight-email", "", "Optional oversight email address")
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 
 	return cmd

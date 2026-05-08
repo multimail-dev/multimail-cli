@@ -17,7 +17,7 @@ func newApproveCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create <token>",
-		Short: "Process approval/rejection from hosted page",
+		Short: "Internal approval handler",
 		Example: "  multimail-pp-cli approve create your-token-here",
 		Annotations: map[string]string{"pp:endpoint": "approve.create", "pp:method": "POST", "pp:path": "/v1/approve/{token}"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -114,5 +114,6 @@ func newApproveCreateCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 
+	cmd.Hidden = true
 	return cmd
 }

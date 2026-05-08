@@ -34,7 +34,7 @@ func newAccountCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Requires a solved proof-of-work challenge. Creates a pending signup and sends a confirmation email. Response is...",
+		Short: "Create a new account",
 		Example: "  multimail-pp-cli account create --operator-name example-resource",
 		Annotations: map[string]string{"pp:endpoint": "account.create", "pp:method": "POST", "pp:path": "/v1/account"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -205,19 +205,19 @@ func newAccountCreateCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().BoolVar(&bodyAcceptedAntiSpamPolicy, "accepted-anti-spam-policy", false, "Must be true.")
 	cmd.Flags().BoolVar(&bodyAcceptedOperatorAgreement, "accepted-operator-agreement", false, "Must be true.")
 	cmd.Flags().BoolVar(&bodyAcceptedTos, "accepted-tos", false, "Must be true.")
-	cmd.Flags().StringVar(&bodyAttribution, "attribution", "", "Optional client-captured conversion attribution (Phase 2 of plan 2026-04-27-003). The browser persists this in...")
-	cmd.Flags().StringVar(&bodyCfChallengeResponse, "cf-challenge-response", "", "Preferred browser Turnstile token field. Mirrors the hidden cf-turnstile-response input value. maxLength keeps API...")
+	cmd.Flags().StringVar(&bodyAttribution, "attribution", "", "Optional conversion attribution data (JSON)")
+	cmd.Flags().StringVar(&bodyCfChallengeResponse, "cf-challenge-response", "", "Browser challenge response token")
 	cmd.Flags().StringVar(&bodyEmailUseType, "email-use-type", "", "Only transactional is accepted today.")
-	cmd.Flags().StringVar(&bodyFingerprint, "fingerprint", "", "Optional browser fingerprint used for signup throttling.")
-	cmd.Flags().IntVar(&bodyFormOpenAt, "form-open-at", 0, "Epoch milliseconds when the signup modal opened.")
+	cmd.Flags().StringVar(&bodyFingerprint, "fingerprint", "", "Optional client fingerprint")
+	cmd.Flags().IntVar(&bodyFormOpenAt, "form-open-at", 0, "Form timing metadata")
 	cmd.Flags().StringVar(&bodyOperatorName, "operator-name", "", "Company or individual name. Included in identity headers and signature block.")
 	cmd.Flags().StringVar(&bodyOversightEmail, "oversight-email", "", "Oversight email")
 	cmd.Flags().StringVar(&bodyOversightMode, "oversight-mode", "", "Optional initial mailbox oversight mode. Unsafe modes are rejected.")
-	cmd.Flags().StringVar(&bodyPaymentMethod, "payment-method", "", "Signup intent source. Pricing page starter flow sends stripe.")
+	cmd.Flags().StringVar(&bodyPaymentMethod, "payment-method", "", "Payment method identifier")
 	cmd.Flags().StringVar(&bodyPhysicalAddress, "physical-address", "", "Physical address")
-	cmd.Flags().StringVar(&bodyPowSolution, "pow-solution", "", "Solved ALTCHA proof-of-work challenge from POST /v1/account/challenge.")
-	cmd.Flags().StringVar(&bodySlug, "slug", "", "URL-safe slug. Auto-generated from operator_name if omitted.")
-	cmd.Flags().StringVar(&bodyTurnstileToken, "turnstile-token", "", "Legacy Turnstile token field. Accepted for backward compatibility. maxLength matches cf_challenge_response — see...")
+	cmd.Flags().StringVar(&bodyPowSolution, "pow-solution", "", "Challenge solution from the account challenge endpoint")
+	cmd.Flags().StringVar(&bodySlug, "slug", "", "Account identifier. Auto-generated from your name if omitted.")
+	cmd.Flags().StringVar(&bodyTurnstileToken, "turnstile-token", "", "Legacy challenge token (backward compatibility)")
 	cmd.Flags().StringVar(&bodyUseCase, "use-case", "", "Use case")
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 

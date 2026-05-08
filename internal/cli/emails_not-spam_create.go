@@ -17,7 +17,7 @@ func newEmailsNotSpamCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create <id>",
-		Short: "Requires send scope. Restores the email to unread and records a user not_spam label.",
+		Short: "Mark an email as not spam. Requires send scope.",
 		Example: "  multimail-pp-cli emails not-spam create 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "not-spam.create", "pp:method": "POST", "pp:path": "/v1/emails/{id}/not-spam"},
 		RunE: func(cmd *cobra.Command, args []string) error {

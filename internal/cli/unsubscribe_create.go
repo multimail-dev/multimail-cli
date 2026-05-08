@@ -114,5 +114,6 @@ func newUnsubscribeCreateCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 
+	cmd.Hidden = true
 	return cmd
 }

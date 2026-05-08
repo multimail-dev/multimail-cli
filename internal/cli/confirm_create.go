@@ -17,7 +17,7 @@ func newConfirmCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "JSON response includes: status, name, oversight_mode, api_key, mailbox_id, mailbox_address, oversight_email,...",
+		Short: "Activate account with confirmation code",
 		Example: "  multimail-pp-cli confirm create",
 		Annotations: map[string]string{"pp:endpoint": "confirm.create", "pp:method": "POST", "pp:path": "/v1/confirm"},
 		RunE: func(cmd *cobra.Command, args []string) error {

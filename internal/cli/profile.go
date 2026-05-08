@@ -16,7 +16,7 @@ import (
 )
 
 // Profile is a named set of flag values saved for reuse across invocations.
-// HeyGen's "Beacon" pattern: one named context that a scheduled agent reuses
+// Named context pattern: a saved set of flags that a scheduled agent reuses
 // day after day with the same voice/format but different input each run.
 type Profile struct {
 	Name        string            `json:"name"`

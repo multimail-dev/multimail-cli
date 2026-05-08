@@ -15,7 +15,7 @@ func newWebhooksGetCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "get <id>",
-		Short: "Includes signing secret. Requires admin scope.",
+		Short: "Get webhook details. Requires admin scope.",
 		Example: "  multimail-pp-cli webhooks get 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "webhooks.get", "pp:method": "GET", "pp:path": "/v1/webhooks/{id}", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {

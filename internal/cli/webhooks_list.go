@@ -15,7 +15,7 @@ func newWebhooksListCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Requires admin scope. Signing secrets are not included in the list.",
+		Short: "List webhook subscriptions. Requires admin scope.",
 		Example: "  multimail-pp-cli webhooks list",
 		Annotations: map[string]string{"pp:endpoint": "webhooks.list", "pp:method": "GET", "pp:path": "/v1/webhooks", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {

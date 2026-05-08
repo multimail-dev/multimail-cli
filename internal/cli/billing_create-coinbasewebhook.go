@@ -17,7 +17,7 @@ func newBillingCreateCoinbasewebhookCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-coinbasewebhook",
-		Short: "Coinbase Commerce webhook handler (public, signature-verified)",
+		Short: "Internal webhook handler",
 		Example: "  multimail-pp-cli billing create-coinbasewebhook",
 		Annotations: map[string]string{"pp:endpoint": "billing.create-coinbasewebhook", "pp:method": "POST", "pp:path": "/v1/billing/coinbase-webhook"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -110,5 +110,6 @@ func newBillingCreateCoinbasewebhookCmd(flags *rootFlags) *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&stdinBody, "stdin", false, "Read request body as JSON from stdin")
 
+	cmd.Hidden = true
 	return cmd
 }

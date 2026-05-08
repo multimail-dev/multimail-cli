@@ -16,7 +16,7 @@ func newApiKeysDeleteCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "delete <keyId>",
-		Short: "Requires admin scope. Returns 202 with pending_approval on first call; resend with approval_code to complete.",
+		Short: "Delete an API key (requires admin scope, two-step approval)",
 		Example: "  multimail-pp-cli api-keys delete 550e8400-e29b-41d4-a716-446655440000",
 		Annotations: map[string]string{"pp:endpoint": "api-keys.delete", "pp:method": "DELETE", "pp:path": "/v1/api-keys/{keyId}"},
 		RunE: func(cmd *cobra.Command, args []string) error {

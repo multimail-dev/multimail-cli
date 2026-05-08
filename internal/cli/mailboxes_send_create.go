@@ -176,7 +176,7 @@ func newMailboxesSendCreateCmd(flags *rootFlags) *cobra.Command {
 	cmd.Flags().StringVar(&bodyAttachments, "attachments", "", "Attachments")
 	cmd.Flags().StringVar(&bodyBcc, "bcc", "", "Bcc")
 	cmd.Flags().StringVar(&bodyCc, "cc", "", "Cc")
-	cmd.Flags().StringVar(&bodyGateTiming, "gate-timing", "", "Override mailbox default: gate_first approves before scheduling, schedule_first schedules then approves on delivery")
+	cmd.Flags().StringVar(&bodyGateTiming, "gate-timing", "", "Override approval timing (gate_first or schedule_first)")
 	cmd.Flags().StringVar(&bodyIdempotencyKey, "idempotency-key", "", "Dedup key (24h TTL). If resent within TTL, returns the original email ID.")
 	cmd.Flags().StringVar(&bodyMarkdown, "markdown", "", "Email body in markdown. Converted to HTML.")
 	cmd.Flags().StringVar(&bodySendAt, "send-at", "", "Schedule delivery for a future time. ISO 8601 UTC (must end with Z). Example: 2026-03-15T14:00:00Z")

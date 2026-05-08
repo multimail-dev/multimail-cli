@@ -15,7 +15,7 @@ func newConfirmGetCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "get <code>",
-		Short: "Redirect to frontend confirmation page with code prefilled",
+		Short: "Internal confirmation redirect",
 		Example: "  multimail-pp-cli confirm get example-value",
 		Annotations: map[string]string{"pp:endpoint": "confirm.get", "pp:method": "GET", "pp:path": "/v1/confirm/{code}", "mcp:read-only": "true"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -73,5 +73,6 @@ func newConfirmGetCmd(flags *rootFlags) *cobra.Command {
 		},
 	}
 
+	cmd.Hidden = true
 	return cmd
 }

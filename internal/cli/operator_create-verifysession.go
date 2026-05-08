@@ -18,7 +18,7 @@ func newOperatorCreateVerifysessionCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create-verifysession",
-		Short: "Requires admin scope. Exchanges a one-time code for a short-lived HttpOnly operator-session cookie.",
+		Short: "Verify operator session with one-time code. Requires admin scope.",
 		Example: "  multimail-pp-cli operator create-verifysession --code example-value",
 		Annotations: map[string]string{"pp:endpoint": "operator.create-verifysession", "pp:method": "POST", "pp:path": "/v1/operator/verify-session"},
 		RunE: func(cmd *cobra.Command, args []string) error {

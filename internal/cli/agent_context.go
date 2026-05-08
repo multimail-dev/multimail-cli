@@ -18,9 +18,7 @@ import (
 const agentContextSchemaVersion = "3"
 
 // agentContext is the structured description of this CLI consumed by AI
-// agents. Inspired by Cloudflare's /cdn-cgi/explorer/api runtime endpoint
-// (2026-04-13 Wrangler post): agents can introspect the live CLI without
-// parsing --help or reading source.
+// agents. Emits structured JSON for agent discovery.
 type agentContext struct {
 	SchemaVersion               string                `json:"schema_version"`
 	CLI                         agentContextCLI       `json:"cli"`
@@ -124,7 +122,7 @@ func buildAgentContext(rootCmd *cobra.Command) agentContext {
 		SchemaVersion: agentContextSchemaVersion,
 		CLI: agentContextCLI{
 			Name:        "multimail-pp-cli",
-			Description: "Email-as-a-Service for AI agents. Inbound email converted to markdown, outbound markdown converted to HTML. Built on...",
+			Description: "Email-as-a-Service for AI agents. Inbound email converted to markdown, outbound markdown converted to HTML.",
 			Version:     rootCmd.Version,
 		},
 		Auth: agentContextAuth{

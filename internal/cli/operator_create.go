@@ -17,7 +17,7 @@ func newOperatorCreateCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Requires admin scope. Clears the operator-session cookie.",
+		Short: "End operator session. Requires admin scope.",
 		Example: "  multimail-pp-cli operator create",
 		Annotations: map[string]string{"pp:endpoint": "operator.create", "pp:method": "POST", "pp:path": "/v1/operator/end-session"},
 		RunE: func(cmd *cobra.Command, args []string) error {

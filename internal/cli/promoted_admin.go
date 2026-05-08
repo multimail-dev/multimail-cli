@@ -17,8 +17,8 @@ func newAdminPromotedCmd(flags *rootFlags) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "admin",
-		Short: "Admin-only. Creates a new API key and emails it to the tenant's oversight email. Used when welcome email failed or...",
-		Long:  "Shortcut for 'admin create'. Admin-only. Creates a new API key and emails it to the tenant's oversight email. Used when welcome email failed or...",
+		Short: "Create and email a new API key to the account owner",
+		Long:  "Shortcut for 'admin create'. Create and email a new API key to the account owner.",
 		Example: "  multimail-pp-cli admin --reason example-value",
 		Annotations: map[string]string{"pp:endpoint": "admin.create", "pp:method": "POST", "pp:path": "/v1/admin/recover-key"},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -99,7 +99,7 @@ func newAdminPromotedCmd(flags *rootFlags) *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVar(&bodyReason, "reason", "", "Reason")
-	cmd.Flags().StringVar(&bodyTenantId, "tenant-id", "", "Tenant id")
+	cmd.Flags().StringVar(&bodyTenantId, "tenant-id", "", "Account ID")
 
 	// Wire sibling endpoints and sub-resources as subcommands
 
