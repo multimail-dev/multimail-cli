@@ -1055,15 +1055,15 @@ func handleSQL(ctx context.Context, req mcplib.CallToolRequest) (*mcplib.CallToo
 		return mcplib.NewToolResultError("query is required"), nil
 	}
 
-	// Block write operations
+	// Block write operations — defense in depth: keyword check + read-only DB connection
 	upper := strings.ToUpper(strings.TrimSpace(query))
-	for _, prefix := range []string{"INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE"} {
+	for _, prefix := range []string{"INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE", "ATTACH", "DETACH", "PRAGMA", "REINDEX", "VACUUM", "WITH"} {
 		if strings.HasPrefix(upper, prefix) {
 			return mcplib.NewToolResultError("only SELECT queries are allowed"), nil
 		}
 	}
 
-	db, err := store.OpenWithContext(ctx, dbPath())
+	db, err := store.OpenReadOnly(ctx, dbPath())
 	if err != nil {
 		return mcplib.NewToolResultError(fmt.Sprintf("opening database: %v", err)), nil
 	}

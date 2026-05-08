@@ -44,7 +44,7 @@ brews:
     repository:
       owner: h179922
       name: homebrew-tap
-    homepage: "https://github.com/h179922/multimail-pp-cli"
+    homepage: "https://github.com/multimail-dev/multimail-cli"
     description: "Email-as-a-Service for AI agents. Inbound email converted to markdown, outbound markdown converted to HTML."
     install: |
       bin.install "multimail-pp-cli"

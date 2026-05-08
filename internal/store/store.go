@@ -54,6 +54,18 @@ func Open(dbPath string) (*Store, error) {
 	return OpenWithContext(context.Background(), dbPath)
 }
 
+// OpenReadOnly opens the SQLite store in read-only mode. Writes (INSERT,
+// UPDATE, DELETE, DROP, ATTACH, etc.) are rejected at the driver level,
+// providing defense-in-depth for the MCP SQL tool.
+func OpenReadOnly(ctx context.Context, dbPath string) (*Store, error) {
+	db, err := sql.Open("sqlite", dbPath+"?mode=ro&_journal_mode=WAL&_busy_timeout=5000&_foreign_keys=ON&_temp_store=MEMORY&_mmap_size=268435456")
+	if err != nil {
+		return nil, fmt.Errorf("opening database (read-only): %w", err)
+	}
+	db.SetMaxOpenConns(2)
+	return &Store{db: db, path: dbPath}, nil
+}
+
 // OpenWithContext opens or creates the SQLite store at dbPath. The
 // context is honored by the migration path: cancellation interrupts the
 // retry-on-SQLITE_BUSY loop and propagates ctx.Err() back to the caller
