@@ -1313,9 +1313,9 @@ func (s *Store) upsertVerifyTx(tx *sql.Tx, id string, obj map[string]any, data j
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET domains_id = excluded.domains_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "domains_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "domains_id"),
 	); err != nil {
 		return fmt.Errorf("insert into verify: %w", err)
 	}
@@ -1413,9 +1413,9 @@ func (s *Store) upsertNotSpamTx(tx *sql.Tx, id string, obj map[string]any, data 
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET emails_id = excluded.emails_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "emails_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "emails_id"),
 	); err != nil {
 		return fmt.Errorf("insert into not_spam: %w", err)
 	}
@@ -1463,9 +1463,9 @@ func (s *Store) upsertReportSpamTx(tx *sql.Tx, id string, obj map[string]any, da
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET emails_id = excluded.emails_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "emails_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "emails_id"),
 	); err != nil {
 		return fmt.Errorf("insert into report_spam: %w", err)
 	}
@@ -1571,9 +1571,9 @@ func (s *Store) upsertReplyTx(tx *sql.Tx, id string, obj map[string]any, data js
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET mailboxes_id = excluded.mailboxes_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "mailboxes_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "mailboxes_id"),
 	); err != nil {
 		return fmt.Errorf("insert into reply: %w", err)
 	}
@@ -1621,9 +1621,9 @@ func (s *Store) upsertRequestUpgradeTx(tx *sql.Tx, id string, obj map[string]any
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET mailboxes_id = excluded.mailboxes_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "mailboxes_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "mailboxes_id"),
 	); err != nil {
 		return fmt.Errorf("insert into request_upgrade: %w", err)
 	}
@@ -1671,9 +1671,9 @@ func (s *Store) upsertSendTx(tx *sql.Tx, id string, obj map[string]any, data jso
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET mailboxes_id = excluded.mailboxes_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "mailboxes_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "mailboxes_id"),
 	); err != nil {
 		return fmt.Errorf("insert into send: %w", err)
 	}
@@ -1721,9 +1721,9 @@ func (s *Store) upsertThreadsTx(tx *sql.Tx, id string, obj map[string]any, data 
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET mailboxes_id = excluded.mailboxes_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "mailboxes_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "mailboxes_id"),
 	); err != nil {
 		return fmt.Errorf("insert into threads: %w", err)
 	}
@@ -1771,9 +1771,9 @@ func (s *Store) upsertUpgradeTx(tx *sql.Tx, id string, obj map[string]any, data 
 		 VALUES (?, ?, ?, ?)
 		 ON CONFLICT(id) DO UPDATE SET mailboxes_id = excluded.mailboxes_id, data = excluded.data, synced_at = excluded.synced_at`,
 		id,
+		lookupFieldValue(obj, "mailboxes_id"),
 		string(data),
 		time.Now(),
-		lookupFieldValue(obj, "mailboxes_id"),
 	); err != nil {
 		return fmt.Errorf("insert into upgrade: %w", err)
 	}

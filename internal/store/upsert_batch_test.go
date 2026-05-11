@@ -608,9 +608,9 @@ func TestUpsertBatch_PopulatesVerifyTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "domains_id": "dom-001"}`),
+		json.RawMessage(`{"id": "test-002", "domains_id": "dom-002"}`),
+		json.RawMessage(`{"id": "test-003", "domains_id": "dom-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("verify", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -724,9 +724,9 @@ func TestUpsertBatch_PopulatesNotSpamTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "emails_id": "email-001"}`),
+		json.RawMessage(`{"id": "test-002", "emails_id": "email-002"}`),
+		json.RawMessage(`{"id": "test-003", "emails_id": "email-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("not_spam", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -766,9 +766,9 @@ func TestUpsertBatch_PopulatesReportSpamTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "emails_id": "email-001"}`),
+		json.RawMessage(`{"id": "test-002", "emails_id": "email-002"}`),
+		json.RawMessage(`{"id": "test-003", "emails_id": "email-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("report_spam", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -850,9 +850,9 @@ func TestUpsertBatch_PopulatesReplyTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "mailboxes_id": "mbx-001"}`),
+		json.RawMessage(`{"id": "test-002", "mailboxes_id": "mbx-002"}`),
+		json.RawMessage(`{"id": "test-003", "mailboxes_id": "mbx-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("reply", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -892,9 +892,9 @@ func TestUpsertBatch_PopulatesRequestUpgradeTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "mailboxes_id": "mbx-001"}`),
+		json.RawMessage(`{"id": "test-002", "mailboxes_id": "mbx-002"}`),
+		json.RawMessage(`{"id": "test-003", "mailboxes_id": "mbx-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("request_upgrade", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -934,9 +934,9 @@ func TestUpsertBatch_PopulatesSendTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "mailboxes_id": "mbx-001"}`),
+		json.RawMessage(`{"id": "test-002", "mailboxes_id": "mbx-002"}`),
+		json.RawMessage(`{"id": "test-003", "mailboxes_id": "mbx-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("send", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -976,9 +976,9 @@ func TestUpsertBatch_PopulatesThreadsTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "mailboxes_id": "mbx-001"}`),
+		json.RawMessage(`{"id": "test-002", "mailboxes_id": "mbx-002"}`),
+		json.RawMessage(`{"id": "test-003", "mailboxes_id": "mbx-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("threads", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)
@@ -1018,9 +1018,9 @@ func TestUpsertBatch_PopulatesUpgradeTable(t *testing.T) {
 	defer s.Close()
 
 	items := []json.RawMessage{
-		json.RawMessage(`{"id": "test-001"}`),
-		json.RawMessage(`{"id": "test-002"}`),
-		json.RawMessage(`{"id": "test-003"}`),
+		json.RawMessage(`{"id": "test-001", "mailboxes_id": "mbx-001"}`),
+		json.RawMessage(`{"id": "test-002", "mailboxes_id": "mbx-002"}`),
+		json.RawMessage(`{"id": "test-003", "mailboxes_id": "mbx-003"}`),
 	}
 	if _, _, err := s.UpsertBatch("upgrade", items); err != nil {
 		t.Fatalf("UpsertBatch: %v", err)

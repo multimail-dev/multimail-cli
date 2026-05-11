@@ -26,7 +26,13 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 		finalArgs := append([]string{}, prefixArgs...)
 		finalArgs = append(finalArgs, cliArgsFromMCP(args)...)
 		if raw, _ := args["args"].(string); strings.TrimSpace(raw) != "" {
-			finalArgs = append(finalArgs, splitShellArgs(raw)...)
+			tokens := splitShellArgs(raw)
+			for _, t := range tokens {
+				if strings.HasPrefix(t, "-") {
+					return mcplib.NewToolResultError(fmt.Sprintf("flag-like argument %q not allowed in positional args field; use structured tool parameters instead", t)), nil
+				}
+			}
+			finalArgs = append(finalArgs, tokens...)
 		}
 		cmd := exec.CommandContext(ctx, lookupPath, finalArgs...)
 		out, err := cmd.CombinedOutput()
@@ -37,10 +43,16 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 	}
 }
 
+// blockedRootFlags are control-plane flags that must not be overridden via MCP.
+var blockedRootFlags = map[string]bool{
+	"args": true, "config": true, "deliver": true,
+	"profile": true, "token": true, "base-url": true,
+}
+
 func cliArgsFromMCP(args map[string]any) []string {
 	keys := make([]string, 0, len(args))
 	for k := range args {
-		if k != "args" {
+		if !blockedRootFlags[k] {
 			keys = append(keys, k)
 		}
 	}
