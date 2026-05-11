@@ -2400,8 +2400,9 @@ func (s *Store) ListIDs(resourceType string) ([]string, error) {
 	).Scan(&validatedName)
 
 	var rows *sql.Rows
-	if err == nil {
-		// Table exists — use the validated name with double-quote identifier quoting
+	if err == nil && safeJSONFieldName.MatchString(validatedName) {
+		// Table exists and name is a safe identifier — use with double-quote quoting.
+		// The regex check prevents breakout via crafted table names containing '"'.
 		rows, err = s.db.Query(fmt.Sprintf(`SELECT id FROM "%s"`, validatedName))
 	} else {
 		// Table not found or error — fall back to generic resources table
