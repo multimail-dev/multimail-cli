@@ -43,10 +43,21 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 	}
 }
 
-// blockedRootFlags are control-plane flags that must not be overridden via MCP.
+// blockedRootFlags blocks ALL root persistent flags from MCP structured
+// parameters. This is an allowlist-by-exclusion: subcommand-specific flags
+// pass through, root-level flags do not. New root flags added to root.go
+// must be added here — the test TestBlockedRootFlags_Complete verifies this.
 var blockedRootFlags = map[string]bool{
-	"args": true, "config": true, "deliver": true,
-	"profile": true, "token": true, "base-url": true,
+	// meta / routing
+	"args": true, "config": true, "profile": true, "deliver": true,
+	// output format
+	"json": true, "compact": true, "csv": true, "plain": true,
+	"quiet": true, "select": true, "no-color": true, "human-friendly": true,
+	// behavior
+	"timeout": true, "dry-run": true, "no-cache": true, "no-input": true,
+	"idempotent": true, "ignore-missing": true, "yes": true, "agent": true,
+	// data source
+	"data-source": true, "rate-limit": true,
 }
 
 func cliArgsFromMCP(args map[string]any) []string {

@@ -45,12 +45,24 @@ func TestCacheKeyEmptyParams(t *testing.T) {
 	}
 }
 
+func TestCacheKeyNoCollisionOnEmbeddedEquals(t *testing.T) {
+	c := minimalClient()
+
+	// {"a": "1b=2"} must NOT collide with {"a": "1", "b": "2"}
+	k1 := c.cacheKey("/test", map[string]string{"a": "1b=2"})
+	k2 := c.cacheKey("/test", map[string]string{"a": "1", "b": "2"})
+
+	if k1 == k2 {
+		t.Fatalf("embedded '=' caused collision: both produced %s", k1)
+	}
+}
+
 func TestCacheKeyExpectedValue(t *testing.T) {
 	c := minimalClient()
 
-	// sha256("/testa=1b=2") first 8 bytes hex-encoded = "4287d6c3d5103936"
+	// sha256("/test\x00a=1\x00b=2") first 8 bytes hex-encoded
 	got := c.cacheKey("/test", map[string]string{"b": "2", "a": "1"})
-	want := "4287d6c3d5103936"
+	want := "4dd0986535043696"
 	if got != want {
 		t.Fatalf("got %s, want %s", got, want)
 	}

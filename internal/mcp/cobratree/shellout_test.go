@@ -99,45 +99,39 @@ func TestPositionalPassthrough(t *testing.T) {
 }
 
 func TestBlockedRootFlags(t *testing.T) {
-	tests := []struct {
-		name string
-		args map[string]any
-	}{
-		{"config", map[string]any{"config": "/tmp/evil"}},
-		{"deliver", map[string]any{"deliver": "smtp://evil"}},
-		{"profile", map[string]any{"profile": "attacker"}},
-		{"token", map[string]any{"token": "stolen-token"}},
-		{"base-url", map[string]any{"base-url": "https://evil.example.com"}},
-		{"args", map[string]any{"args": "some positional"}},
+	// Every root persistent flag must be blocked. If you add a flag to
+	// root.go's PersistentFlags, add it to blockedRootFlags in shellout.go
+	// and to this list.
+	allBlocked := []string{
+		"args", "config", "profile", "deliver",
+		"json", "compact", "csv", "plain", "quiet", "select",
+		"no-color", "human-friendly",
+		"timeout", "dry-run", "no-cache", "no-input",
+		"idempotent", "ignore-missing", "yes", "agent",
+		"data-source", "rate-limit",
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := cliArgsFromMCP(tt.args)
-			for _, r := range result {
-				for blocked := range blockedRootFlags {
-					if r == "--"+blocked {
-						t.Errorf("cliArgsFromMCP(%v) produced blocked flag --%s", tt.args, blocked)
-					}
-				}
-			}
+	for _, flag := range allBlocked {
+		t.Run(flag, func(t *testing.T) {
+			result := cliArgsFromMCP(map[string]any{flag: "evil-value"})
 			if len(result) != 0 {
-				t.Errorf("cliArgsFromMCP(%v) = %v, want empty slice", tt.args, result)
+				t.Errorf("cliArgsFromMCP({%q: ...}) = %v, want empty (blocked flag)", flag, result)
 			}
 		})
 	}
 }
 
 func TestAllowedFlags(t *testing.T) {
+	// Subcommand-specific flags (not in blockedRootFlags) must pass through.
 	tests := []struct {
 		name string
 		args map[string]any
 		want []string
 	}{
-		{"compact bool", map[string]any{"compact": true}, []string{"--compact"}},
 		{"format string", map[string]any{"format": "json"}, []string{"--format", "json"}},
 		{"limit float64", map[string]any{"limit": float64(10)}, []string{"--limit", "10"}},
-		{"multiple allowed", map[string]any{"compact": true, "format": "json"}, []string{"--compact", "--format", "json"}},
-		{"allowed with blocked mixed", map[string]any{"compact": true, "config": "/tmp/evil"}, []string{"--compact"}},
+		{"id string", map[string]any{"id": "abc-123"}, []string{"--id", "abc-123"}},
+		{"multiple allowed", map[string]any{"format": "json", "limit": float64(5)}, []string{"--format", "json", "--limit", "5"}},
+		{"allowed with blocked mixed", map[string]any{"format": "json", "config": "/tmp/evil"}, []string{"--format", "json"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

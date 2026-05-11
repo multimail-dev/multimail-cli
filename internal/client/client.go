@@ -99,7 +99,7 @@ func (c *Client) cacheKey(path string, params map[string]string) string {
 	sort.Strings(keys)
 	key := path
 	for _, k := range keys {
-		key += k + "=" + params[k]
+		key += "\x00" + k + "=" + params[k]
 	}
 	h := sha256.Sum256([]byte(key))
 	return hex.EncodeToString(h[:8])
