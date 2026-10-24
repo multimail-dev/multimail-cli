@@ -112,7 +112,10 @@ func TestBlockedRootFlags(t *testing.T) {
 	}
 	for _, flag := range allBlocked {
 		t.Run(flag, func(t *testing.T) {
-			result := cliArgsFromMCP(map[string]any{flag: "evil-value"})
+			result, err := cliArgsFromMCP(map[string]any{flag: "evil-value"})
+			if err != nil {
+				t.Fatal(err)
+			}
 			if len(result) != 0 {
 				t.Errorf("cliArgsFromMCP({%q: ...}) = %v, want empty (blocked flag)", flag, result)
 			}
@@ -127,15 +130,18 @@ func TestAllowedFlags(t *testing.T) {
 		args map[string]any
 		want []string
 	}{
-		{"format string", map[string]any{"format": "json"}, []string{"--format", "json"}},
-		{"limit float64", map[string]any{"limit": float64(10)}, []string{"--limit", "10"}},
-		{"id string", map[string]any{"id": "abc-123"}, []string{"--id", "abc-123"}},
-		{"multiple allowed", map[string]any{"format": "json", "limit": float64(5)}, []string{"--format", "json", "--limit", "5"}},
-		{"allowed with blocked mixed", map[string]any{"format": "json", "config": "/tmp/evil"}, []string{"--format", "json"}},
+		{"format string", map[string]any{"format": "json"}, []string{"--format=json"}},
+		{"limit float64", map[string]any{"limit": float64(10)}, []string{"--limit=10"}},
+		{"id string", map[string]any{"id": "abc-123"}, []string{"--id=abc-123"}},
+		{"multiple allowed", map[string]any{"format": "json", "limit": float64(5)}, []string{"--format=json", "--limit=5"}},
+		{"allowed with blocked mixed", map[string]any{"format": "json", "config": "/tmp/evil"}, []string{"--format=json"}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := cliArgsFromMCP(tt.args)
+			got, err := cliArgsFromMCP(tt.args)
+			if err != nil {
+				t.Fatal(err)
+			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("cliArgsFromMCP(%v) = %v, want %v", tt.args, got, tt.want)
 			}

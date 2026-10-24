@@ -24,7 +24,11 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 		}
 		args := req.GetArguments()
 		finalArgs := append([]string{}, prefixArgs...)
-		finalArgs = append(finalArgs, cliArgsFromMCP(args)...)
+		flagArgs, err := cliArgsFromMCP(args)
+		if err != nil {
+			return mcplib.NewToolResultError(err.Error()), nil
+		}
+		finalArgs = append(finalArgs, flagArgs...)
 		if raw, _ := args["args"].(string); strings.TrimSpace(raw) != "" {
 			tokens := splitShellArgs(raw)
 			for _, t := range tokens {
@@ -46,7 +50,7 @@ func shellOutToCLI(cliPath func() (string, error), commandPath []string) server.
 // blockedRootFlags blocks ALL root persistent flags from MCP structured
 // parameters. This is an allowlist-by-exclusion: subcommand-specific flags
 // pass through, root-level flags do not. New root flags added to root.go
-// must be added here — the test TestBlockedRootFlags_Complete verifies this.
+// must be added here — TestDeclaredFlagNamesMatchStructuredContract verifies this.
 var blockedRootFlags = map[string]bool{
 	// meta / routing
 	"args": true, "config": true, "profile": true, "deliver": true,
@@ -60,44 +64,67 @@ var blockedRootFlags = map[string]bool{
 	"data-source": true, "rate-limit": true,
 }
 
-func cliArgsFromMCP(args map[string]any) []string {
+func cliArgsFromMCP(args map[string]any) ([]string, error) {
 	keys := make([]string, 0, len(args))
 	for k := range args {
-		if !blockedRootFlags[k] {
-			keys = append(keys, k)
-		}
+		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	var out []string
 	for _, k := range keys {
+		// A property is a flag name, not an argv fragment. In particular,
+		// pflag interprets an embedded '=' as a name/value separator.
+		if !validStructuredFlagName(k) {
+			return nil, fmt.Errorf("invalid structured parameter name %q; use a flag name without CLI syntax", k)
+		}
+		if blockedRootFlags[k] {
+			continue
+		}
+		// Bind each value to its option even when the supplied type differs
+		// from the declared type. A bool flag must not release a following
+		// flag-looking string back into the parser as another option.
 		v := args[k]
 		switch tv := v.(type) {
 		case bool:
-			if tv {
-				out = append(out, "--"+k)
-			}
+			out = append(out, "--"+k+"="+strconv.FormatBool(tv))
 		case float64:
-			out = append(out, "--"+k, strconv.FormatFloat(tv, 'f', -1, 64))
+			out = append(out, "--"+k+"="+strconv.FormatFloat(tv, 'f', -1, 64))
 		case string:
-			if tv != "" {
-				out = append(out, "--"+k, tv)
-			}
+			out = append(out, "--"+k+"="+tv)
 		case []any:
 			if len(tv) > 0 {
 				parts := make([]string, 0, len(tv))
 				for _, item := range tv {
 					parts = append(parts, fmt.Sprintf("%v", item))
 				}
-				out = append(out, "--"+k, strings.Join(parts, ","))
+				out = append(out, "--"+k+"="+strings.Join(parts, ","))
 			}
 		default:
 			if v != nil {
-				out = append(out, "--"+k, fmt.Sprintf("%v", v))
+				out = append(out, "--"+k+"="+fmt.Sprintf("%v", v))
 			}
 		}
 	}
-	return out
+	return out, nil
+}
+
+// Structured names use the canonical ASCII spelling emitted by the Cobra
+// schema. Shorthands and --name=value belong to CLI argv, not property names.
+func validStructuredFlagName(name string) bool {
+	if name == "" {
+		return false
+	}
+	for i, r := range name {
+		if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') || (r >= '0' && r <= '9') {
+			continue
+		}
+		if i > 0 && (r == '-' || r == '_') {
+			continue
+		}
+		return false
+	}
+	return true
 }
 
 // splitShellArgs whitespace-splits with double-quoted-token preservation.
